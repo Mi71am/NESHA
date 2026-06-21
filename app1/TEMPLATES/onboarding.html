@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UmojaPay Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@100;300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/onboarding.css' %}">
+</head>
+<body>
+  <main class="onboarding-root">
+    <section id="heroSlides" class="hero-slides" aria-label="Onboarding images">
+      <article class="hero-slide screen-one is-active" aria-label="Onboarding slide 1" data-banner="Every Path Deserves A Future">
+        <img class="shared-bg" src="{% static 'images/onAllContainerA.png' %}" alt="Shared background" />
+        <img class="layer on1-a" src="{% static 'images/on1container1A.png' %}" alt="Nesha logo and children" />
+        <img class="layer on1-b" src="{% static 'images/on1Container1B.png' %}" alt="Decorative tree" />
+
+        <div class="slide-text on1-text">
+          <p class="lead">A community-powered movement ensuring every child has a place at the table.</p>
+          <p class="sub">Begin your Journey...</p>
+        </div>
+      </article>
+
+      <article class="hero-slide screen-two" aria-label="Onboarding slide 2" data-banner="Every contribution starts with someone who cares.">
+        <img class="shared-bg" src="{% static 'images/onAllContainerA.png' %}" alt="Shared background" />
+        <img class="layer on2-a" src="{% static 'images/on2Container2A.png' %}" alt="Mountain and people artwork" />
+        <img class="layer on2-b" src="{% static 'images/on2Container2B.png' %}" alt="Left tree" />
+        <img class="layer on2-c" src="{% static 'images/on2Container2C.png' %}" alt="Right tree and giraffe" />
+      </article>
+
+      <article class="hero-slide screen-three" aria-label="Onboarding slide 3" data-banner="Together, We Nourish Tomorrow.">
+        <img class="shared-bg" src="{% static 'images/onAllContainerA.png' %}" alt="Shared background" />
+        <img class="layer on3-a" src="{% static 'images/on3Container3A.png' %}" alt="Smiling children" />
+        <img class="layer on3-b" src="{% static 'images/on3Container3B.png' %}" alt="Tree and giraffe" />
+
+        <div class="slide-text on3-text">
+          <h1>FUTURES ARE MEANT TO BE SHARED.</h1>
+          <p class="lead">Every meal creates momentum.</p>
+          <p class="sub">Join The Movement Today.</p>
+        </div>
+      </article>
+
+      <button id="nextSlideBtn" class="next-slide-btn" type="button" aria-label="Next onboarding slide">&#8250;</button>
+
+      <div class="slide-dots" aria-label="Slide indicators">
+        <button class="dot is-active" type="button" data-slide="0" aria-label="Go to slide 1"></button>
+        <button class="dot" type="button" data-slide="1" aria-label="Go to slide 2"></button>
+        <button class="dot" type="button" data-slide="2" aria-label="Go to slide 3"></button>
+      </div>
+    </section>
+
+    <section class="content-banner">
+      <div class="banner-inner">
+        <p id="bannerTagline" class="banner-tagline">Every Path Deserves A Future</p>
+        <div class="banner-actions">
+          <button class="banner-btn" type="button">Sign Up</button>
+          <button class="banner-btn" type="button">Login</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="{% static 'javascript/onboarding.js' %}"></script>
+</body>
+</html>
