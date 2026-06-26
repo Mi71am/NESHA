@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nesha Sign Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body class="page-auth page-signup">
+  <main class="page-wrap">
+    <img class="top-logo" src="{% static 'images/officialLogo.png' %}" alt="Nesha logo">
+    <a class="top-back-arrow" href="{% url 'onboarding' %}" aria-label="Back to onboarding">&#8592;</a>
+
+    <section class="form-card signup-card" aria-label="Signup panel">
+      <h1 class="form-title">BEGIN YOUR JOURNEY</h1>
+
+      {% if form.non_field_errors %}
+        <p class="field-error">{{ form.non_field_errors|join:", " }}</p>
+      {% endif %}
+
+      <form id="signupForm" class="user-form" method="post" novalidate>
+        {% csrf_token %}
+
+        <label class="field-label" for="fullName">Full Name</label>
+        <input class="field-input" id="fullName" name="full_name" type="text" placeholder="Enter your full name" value="{{ form.full_name.value|default_if_none:'' }}" required>
+        {% if form.full_name.errors %}
+          <p class="field-error">{{ form.full_name.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="email">Email Address</label>
+        <input class="field-input" id="email" name="email" type="email" placeholder="Enter your email" value="{{ form.email.value|default_if_none:'' }}" required>
+        {% if form.email.errors %}
+          <p class="field-error">{{ form.email.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="phoneNumber">Phone Number</label>
+        <input class="field-input" id="phoneNumber" name="phone_number" type="text" placeholder="Enter your phone number" value="{{ form.phone_number.value|default_if_none:'' }}" required>
+        {% if form.phone_number.errors %}
+          <p class="field-error">{{ form.phone_number.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="roleSelect">Intended Role</label>
+        <select class="field-select" id="roleSelect" name="role" required>
+          {% with selected_role=form.role.value|default:'customer_donor' %}
+            <option value="customer_donor" {% if selected_role == 'customer_donor' %}selected{% endif %}>Cafeteria Customer (Donor)</option>
+            <option value="cashier" {% if selected_role == 'cashier' %}selected{% endif %}>Cafeteria Cashier</option>
+            <option value="school_representative" {% if selected_role == 'school_representative' %}selected{% endif %}>School Representative</option>
+          {% endwith %}
+        </select>
+        {% if form.role.errors %}
+          <p class="field-error">{{ form.role.errors|join:", " }}</p>
+        {% endif %}
+
+        <section id="cashierFields" class="role-section" aria-live="polite">
+          <label class="field-label" for="cashierNationalId">National ID Number</label>
+          <input class="field-input" id="cashierNationalId" name="cashier_national_id_number" type="text" value="{{ form.cashier_national_id_number.value|default_if_none:'' }}">
+          {% if form.cashier_national_id_number.errors %}
+            <p class="field-error">{{ form.cashier_national_id_number.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="cashierEmployeeNumber">Employee Number</label>
+          <input class="field-input" id="cashierEmployeeNumber" name="cashier_employee_number" type="text" value="{{ form.cashier_employee_number.value|default_if_none:'' }}">
+          {% if form.cashier_employee_number.errors %}
+            <p class="field-error">{{ form.cashier_employee_number.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="cashierWorkstationNumber">Workstation Number</label>
+          <input class="field-input" id="cashierWorkstationNumber" name="cashier_workstation_number" type="text" value="{{ form.cashier_workstation_number.value|default_if_none:'' }}">
+          {% if form.cashier_workstation_number.errors %}
+            <p class="field-error">{{ form.cashier_workstation_number.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="cashierInstitutionName">Institution Name</label>
+          <input class="field-input" id="cashierInstitutionName" name="cashier_institution_name" type="text" value="{{ form.cashier_institution_name.value|default_if_none:'' }}">
+          {% if form.cashier_institution_name.errors %}
+            <p class="field-error">{{ form.cashier_institution_name.errors|join:", " }}</p>
+          {% endif %}
+        </section>
+
+        <section id="schoolFields" class="role-section" aria-live="polite">
+          <label class="field-label" for="schoolNationalId">National ID Number</label>
+          <input class="field-input" id="schoolNationalId" name="school_national_id_number" type="text" value="{{ form.school_national_id_number.value|default_if_none:'' }}">
+          {% if form.school_national_id_number.errors %}
+            <p class="field-error">{{ form.school_national_id_number.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="schoolName">School Name</label>
+          <input class="field-input" id="schoolName" name="school_name" type="text" value="{{ form.school_name.value|default_if_none:'' }}">
+          {% if form.school_name.errors %}
+            <p class="field-error">{{ form.school_name.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="schoolCode">School Code (KNBS/KNEC)</label>
+          <input class="field-input" id="schoolCode" name="school_code" type="text" value="{{ form.school_code.value|default_if_none:'' }}">
+          {% if form.school_code.errors %}
+            <p class="field-error">{{ form.school_code.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="tscNumber">TSC Number</label>
+          <input class="field-input" id="tscNumber" name="tsc_number" type="text" value="{{ form.tsc_number.value|default_if_none:'' }}">
+          {% if form.tsc_number.errors %}
+            <p class="field-error">{{ form.tsc_number.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="schoolPosition">Position</label>
+          <input class="field-input" id="schoolPosition" name="school_position" type="text" value="{{ form.school_position.value|default_if_none:'' }}">
+          {% if form.school_position.errors %}
+            <p class="field-error">{{ form.school_position.errors|join:", " }}</p>
+          {% endif %}
+
+          <label class="field-label" for="schoolYearsOfService">Years of Service</label>
+          <input class="field-input" id="schoolYearsOfService" name="school_years_of_service" type="number" min="0" step="1" value="{{ form.school_years_of_service.value|default_if_none:'' }}">
+          {% if form.school_years_of_service.errors %}
+            <p class="field-error">{{ form.school_years_of_service.errors|join:", " }}</p>
+          {% endif %}
+        </section>
+
+        <label class="field-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input class="field-input" id="password" name="password" type="password" placeholder="Create a password" required>
+          <button class="toggle-password" type="button" data-target="password">Show</button>
+        </div>
+        {% if form.password.errors %}
+          <p class="field-error">{{ form.password.errors|join:", " }}</p>
+        {% endif %}
+
+        <ul id="passwordRules" class="pw-rules" aria-live="polite">
+          <li data-rule="length" class="bad">At least 8 characters</li>
+          <li data-rule="upper" class="bad">At least one uppercase letter</li>
+          <li data-rule="lower" class="bad">At least one lowercase letter</li>
+          <li data-rule="number" class="bad">At least one number</li>
+          <li data-rule="special" class="bad">At least one special character</li>
+        </ul>
+
+        <label class="field-label" for="confirmPassword">Confirm Password</label>
+        <div class="input-wrap">
+          <input class="field-input" id="confirmPassword" name="confirm_password" type="password" placeholder="Confirm your password" required>
+          <button class="toggle-password" type="button" data-target="confirmPassword">Show</button>
+        </div>
+        <p id="passwordMatchError" class="field-error" hidden>Passwords do not match</p>
+        {% if form.confirm_password.errors %}
+          <p class="field-error">{{ form.confirm_password.errors|join:", " }}</p>
+        {% endif %}
+
+        <button id="signupSubmit" class="main-btn" type="submit" disabled>Sign Up</button>
+        <p class="auth-switch-text">
+          Already have an account?
+          <a class="auth-switch-link" href="{% url 'login' %}">Login here</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script src="{% static 'javascript/signup.js' %}"></script>
+</body>
+</html>
