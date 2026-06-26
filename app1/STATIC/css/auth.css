@@ -1,0 +1,240 @@
+:root {
+  --panel-bg: rgba(39, 21, 21, 0.58);
+  --field-bg: #d2cdc6;
+  --cta-bg: #9ba19d;
+  --text-light: rgba(255, 255, 255, 0.82);
+  --text-muted: rgba(255, 255, 255, 0.62);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+.page-auth {
+  min-height: 100vh;
+  font-family: "Montserrat", sans-serif;
+  color: #ffffff;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.page-login {
+  background-image: url("../images/loginK.png");
+}
+
+.page-wrap {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.top-logo {
+  position: absolute;
+  top: clamp(0.4rem, 1.5vw, 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(5rem, 9vw, 8rem);
+  height: auto;
+  z-index: 7;
+}
+
+.go-back {
+  position: absolute;
+  top: clamp(0.8rem, 2vw, 1.5rem);
+  left: clamp(0.8rem, 2vw, 1.5rem);
+  width: clamp(2.6rem, 4.5vw, 3.4rem);
+  height: clamp(2.6rem, 4.5vw, 3.4rem);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+  line-height: 1;
+  z-index: 6;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+.go-back:hover {
+  background: rgba(0, 0, 0, 0.56);
+}
+
+.form-card {
+  position: absolute;
+  border-radius: clamp(4rem, 8.4vw, 12.5rem);
+  background: var(--panel-bg);
+  padding: clamp(1.3rem, 2.4vw, 2.4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: clamp(0.7rem, 1.1vw, 1rem);
+  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+/* from the original Figma frame proportions */
+.login-card {
+  top: 8.03%;
+  width: 36.32%;
+  height: 74.45%;
+  left: 51.96%;
+}
+
+.form-title {
+  margin: 0;
+  text-align: center;
+  font-family: "Marcellus", serif;
+  letter-spacing: 0.09em;
+  font-size: clamp(1.2rem, 1.56vw, 2.3125rem);
+  color: #ffffff;
+}
+
+.flash-wrap {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.flash-msg {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  font-size: clamp(0.72rem, 0.86vw, 0.84rem);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.flash-msg.success {
+  background: rgba(149, 218, 165, 0.32);
+}
+
+.flash-msg.error {
+  background: rgba(214, 108, 108, 0.35);
+}
+
+.field-error {
+  margin: -0.2rem 0 0;
+  color: #ffd0d0;
+  font-size: clamp(0.7rem, 0.82vw, 0.8rem);
+}
+
+.user-form {
+  display: grid;
+  gap: clamp(0.6rem, 1vw, 0.9rem);
+}
+
+.field-label {
+  font-size: clamp(0.78rem, 0.95vw, 0.95rem);
+  color: var(--text-light);
+}
+
+.field-input,
+.field-select {
+  width: 100%;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.78rem 0.9rem;
+  background: var(--field-bg);
+  color: #2a1f1f;
+  font-size: clamp(0.8rem, 0.95vw, 0.94rem);
+}
+
+.field-input::placeholder {
+  color: rgba(39, 21, 21, 0.6);
+}
+
+.field-select {
+  cursor: pointer;
+}
+
+.role-hint {
+  margin: 0;
+  min-height: 1rem;
+  font-size: clamp(0.68rem, 0.78vw, 0.8rem);
+  color: var(--text-muted);
+}
+
+.main-btn {
+  margin-top: 0.35rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.86rem 1rem;
+  width: clamp(9rem, 40%, 12rem);
+  justify-self: center;
+  background: var(--cta-bg);
+  color: #2a1f1f;
+  font-weight: 700;
+  font-size: clamp(0.85rem, 0.92vw, 0.95rem);
+  cursor: pointer;
+}
+
+.main-btn:hover {
+  filter: brightness(1.05);
+}
+
+.bottom-back {
+  margin-top: auto;
+  text-align: center;
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: clamp(0.72rem, 0.82vw, 0.82rem);
+}
+
+.bottom-back:hover {
+  text-decoration: underline;
+}
+
+.helper-text {
+  margin: 0.2rem 0 0;
+  text-align: center;
+  font-size: clamp(0.74rem, 0.86vw, 0.88rem);
+  color: var(--text-light);
+}
+
+.helper-link {
+  color: #6a1f2f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.helper-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .login-card {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(92vw, 36rem);
+    height: auto;
+    max-height: 98vh;
+  }
+}
+
+@media (max-width: 560px) {
+  .form-card {
+    border-radius: 2rem;
+    padding: 1rem;
+  }
+
+  .go-back {
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 1.5rem;
+  }
+
+  .top-logo {
+    width: clamp(4.2rem, 20vw, 6rem);
+  }
+
+  .form-title {
+    font-size: clamp(1.05rem, 4.8vw, 1.4rem);
+  }
+}

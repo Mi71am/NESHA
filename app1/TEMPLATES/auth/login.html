@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body class="page-auth page-login">
+  <main class="page-wrap">
+    <img class="top-logo" src="{% static 'images/officialLogo.png' %}" alt="Official logo">
+
+    <a class="go-back" href="{% url 'onboarding' %}" aria-label="Back to onboarding">&#8249;</a>
+
+    <section class="form-card login-card" aria-label="Login panel">
+      <h1 class="form-title">BEGIN YOUR JOURNEY</h1>
+
+      {% if messages %}
+        <div class="flash-wrap" aria-live="polite">
+          {% for message in messages %}
+            <p class="flash-msg {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form class="user-form" method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <p class="field-error">{{ form.non_field_errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="email">Email</label>
+        <input
+          class="field-input"
+          id="email"
+          name="email"
+          type="email"
+          placeholder="Enter your email"
+          value="{{ form.email.value|default_if_none:'' }}"
+          required
+        >
+        {% if form.email.errors %}
+          <p class="field-error">{{ form.email.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="password">Password</label>
+        <input class="field-input" id="password" name="password" type="password" placeholder="Enter your password" required>
+        {% if form.password.errors %}
+          <p class="field-error">{{ form.password.errors|join:", " }}</p>
+        {% endif %}
+
+        <button class="main-btn" type="submit">Login</button>
+
+        <p class="helper-text">
+          Don't have an account?
+          <a class="helper-link" href="{% url 'signup' %}">Sign Up Here</a>
+        </p>
+      </form>
+
+    </section>
+  </main>
+</body>
+</html>
