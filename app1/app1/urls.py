@@ -20,5 +20,9 @@ from . import views
 
 urlpatterns = [
     path('', views.onboarding_view, name='onboarding'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('signup/', views.signup_view, name='signup'),
+    path('role-upgrade-request/', views.role_upgrade_request_view, name='role-upgrade-request'),
     path('admin/', admin.site.urls),
 ]
