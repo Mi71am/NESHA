@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Donate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/donations_page.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile-block">
+        {% if profile.profile_picture %}
+          <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+        {% else %}
+          <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+        {% endif %}
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <a class="nav-link" href="{% url 'dashboard:customer' %}">
+          <img src="{% static 'images/homeicon.png' %}" alt="Dashboard icon">
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link active" href="{% url 'donations:index' %}">
+          <img src="{% static 'images/hearticon.png' %}" alt="Donate icon">
+          <span>Donate</span>
+        </a>
+        <a class="nav-link" href="{% url 'reports:index' %}">
+          <img src="{% static 'images/impactstatsicon.png' %}" alt="Impact statistics icon">
+          <span>Impact Statistics</span>
+        </a>
+        <a class="nav-link" href="{% url 'payments:history' %}">
+          <img src="{% static 'images/formicon.png' %}" alt="Transaction history icon">
+          <span>Transaction History</span>
+        </a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+          <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <img class="bg bg-one" src="{% static 'images/cu1Container1.png' %}" alt="">
+      <img class="bg bg-two" src="{% static 'images/cu1Container2.png' %}" alt="">
+      <img class="bg bg-three" src="{% static 'images/cu1Container3.png' %}" alt="">
+      <img class="bg bg-four" src="{% static 'images/cu1Container4.png' %}" alt="">
+
+      <section class="donate-panel" aria-label="Donation options">
+        <h1>Fuel a Future</h1>
+        <hr class="donate-divider">
+        <p class="donate-lead">Select a contribution PACKAGE that reflects the impact you'd like to create.</p>
+
+        <div class="package-grid" role="radiogroup" aria-label="Donation package options">
+          <button class="package-btn" type="button" data-amount="100" data-package="NOURISH TODAY" aria-label="Ksh 100 package">
+            <img src="{% static 'images/C1DONATE.png' %}" alt="Ksh 100 package">
+          </button>
+          <button class="package-btn" type="button" data-amount="300" data-package="EMPOWER TOMORROW" aria-label="Ksh 300 package">
+            <img src="{% static 'images/C2DONATE.png' %}" alt="Ksh 300 package">
+          </button>
+          <button class="package-btn" type="button" data-amount="500" data-package="RISE TOGETHER" aria-label="Ksh 500 package">
+            <img src="{% static 'images/C3DONATE.png' %}" alt="Ksh 500 package">
+          </button>
+        </div>
+
+        <p id="packageSelectedMsg" class="package-selected-msg" hidden></p>
+
+        <p class="custom-title">OR, ENTER A CUSTOM AMOUNT:</p>
+        <input id="customAmountInput" class="custom-input" type="number" min="1" max="1000000" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="Custom Amount">
+
+        <p class="donate-note">ⓘ Every contribution helps create opportunities that extend far beyond a single meal.</p>
+
+        <div class="progress-wrap">
+          <div class="progress-row">
+            <img class="map-icon" src="{% static 'images/MAPCONTAINER.png' %}" alt="Map icon">
+
+            <div class="progress-stack">
+              <div class="progress-track-shell">
+                <img class="progress-outer" src="{% static 'images/OUTERPROGBAR.png' %}" alt="Progress track">
+              </div>
+
+              <p class="progress-text"><strong id="progressPercentText">{{ progress_percent }}</strong>% of our annual meal support target achieved</p>
+            </div>
+          </div>
+        </div>
+
+        <button id="proceedDonationBtn" class="proceed-btn" type="button">Proceed To Payment</button>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+
+  <script>
+    window.donationConfig = {
+      paymentsUrl: "{% url 'payments:index' %}"
+    };
+  </script>
+  <script src="{% static 'javascript/donations_page.js' %}"></script>
+</body>
+</html>

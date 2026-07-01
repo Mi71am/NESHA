@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Cashier Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/cashier_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <a class="nav-link active" href="{% url 'dashboard:cashier' %}">
+          <img src="{% static 'images/homeicon.png' %}" alt="Dashboard icon">
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="{% url 'payments:cashier_history' %}">
+          <img src="{% static 'images/formicon.png' %}" alt="Transaction history icon">
+          <span>Meal Transactions</span>
+        </a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+          <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <img class="bg bg-one" src="{% static 'images/cu1Container1.png' %}" alt="">
+      <img class="bg bg-two" src="{% static 'images/cu1Container2.png' %}" alt="">
+      <img class="bg bg-three" src="{% static 'images/cu1Container3.png' %}" alt="">
+      <img class="bg bg-four" src="{% static 'images/cu1Container4.png' %}" alt="">
+
+      <section class="welcome-banner" aria-label="Welcome banner">
+        <h1>WELCOME, CASHIER:</h1>
+        <p>{{ display_name }}</p>
+      </section>
+
+      <section class="panel-row" aria-label="Cashier dashboard panels">
+        <article class="panel panel-large payment-panel" aria-label="Meal payment performance">
+          <h3 class="payment-title">Meal Payments Overview</h3>
+          <hr class="payment-divider">
+
+          <div class="payment-summary">
+            <div class="summary-row donation-row">
+              <span class="summary-label">Today Meal Total:</span>
+              <span class="summary-value donation-box">Ksh {{ today_meal_total|floatformat:0 }}</span>
+            </div>
+            <div class="summary-row meal-row">
+              <span class="summary-label">All Time Meal Total:</span>
+              <span class="summary-value meal-box">Ksh {{ total_meal_value|floatformat:0 }}</span>
+            </div>
+            <div class="summary-row total-row">
+              <span class="summary-label">Meal Transactions:</span>
+              <span class="summary-value total-box">{{ total_meal_transactions }}</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel panel-small transactions-panel" aria-label="Recent meal transactions">
+          <h3 class="payment-title">Recent Meal Payments</h3>
+          <div class="transactions-header-row">
+            <span>Date</span>
+            <span>Customer</span>
+            <span>Meal Amount</span>
+          </div>
+          <hr class="payment-divider transactions-divider">
+
+          <div class="transactions-list">
+            {% if recent_payments %}
+              {% for tx in recent_payments %}
+                <div class="tx-row">
+                  <span class="tx-date">{{ tx.payment_date|date:"d M" }}</span>
+                  <span class="tx-pill donation-pill">{{ tx.payer_profile.full_name|default:'Customer' }}</span>
+                  <span class="tx-pill meal-pill">Ksh {{ tx.meal_amount|default_if_none:0|floatformat:0 }}</span>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="tx-empty">No meal transactions yet.</p>
+            {% endif %}
+          </div>
+
+          <a class="proceed-btn tx-view-all-btn" href="{% url 'payments:cashier_history' %}">View Full Meal History</a>
+        </article>
+      </section>
+
+      <section class="urgent-support-footer" aria-label="Urgent support message">
+        <form method="post" action="{% url 'dashboard:send_urgent_message' %}" class="urgent-support-form">
+          {% csrf_token %}
+          <label for="cashierUrgentMessage">Need assistance with the system? Send urgent messages here</label>
+          <div class="urgent-input-row">
+            <textarea id="cashierUrgentMessage" name="message_text" rows="2" maxlength="1000" placeholder="Describe your issue briefly..." required></textarea>
+            <button type="submit">Send</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

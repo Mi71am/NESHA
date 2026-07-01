@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Transaction History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/transactions_history.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile-block">
+        {% if profile.profile_picture %}
+          <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+        {% else %}
+          <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+        {% endif %}
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <a class="nav-link" href="{% url 'dashboard:customer' %}">
+          <img src="{% static 'images/homeicon.png' %}" alt="Dashboard icon">
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="{% url 'donations:index' %}">
+          <img src="{% static 'images/hearticon.png' %}" alt="Donate icon">
+          <span>Donate</span>
+        </a>
+        <a class="nav-link" href="{% url 'reports:index' %}">
+          <img src="{% static 'images/impactstatsicon.png' %}" alt="Impact statistics icon">
+          <span>Impact Statistics</span>
+        </a>
+        <a class="nav-link active" href="{% url 'payments:history' %}">
+          <img src="{% static 'images/formicon.png' %}" alt="Transaction history icon">
+          <span>Transaction History</span>
+        </a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+          <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <img class="bg bg-one" src="{% static 'images/cu1Container1.png' %}" alt="">
+      <img class="bg bg-two" src="{% static 'images/cu1Container2.png' %}" alt="">
+      <img class="bg bg-three" src="{% static 'images/cu1Container3.png' %}" alt="">
+      <img class="bg bg-four" src="{% static 'images/cu1Container4.png' %}" alt="">
+
+      <section class="history-panel" aria-label="Transaction history list">
+        <h1>Transactions</h1>
+        <div class="history-header-row">
+          <span>Receipt Number</span>
+          <span>Date</span>
+          <span>Donation Amount</span>
+          <span>Meal Amount</span>
+        </div>
+        <hr class="history-divider">
+
+        <div class="history-list">
+          {% if transactions %}
+            {% for tx in transactions %}
+              <div class="history-row">
+                <span class="history-receipt">{{ tx.payment_id }}</span>
+                <span class="history-date">{{ tx.payment_date|date:"d M Y" }}</span>
+                <span class="history-pill donation-pill">Ksh {{ tx.donation_amount|default_if_none:0|floatformat:0 }}</span>
+                <span class="history-pill meal-pill">Ksh {{ tx.meal_amount|default_if_none:0|floatformat:0 }}</span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="history-empty">No transactions yet.</p>
+          {% endif %}
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

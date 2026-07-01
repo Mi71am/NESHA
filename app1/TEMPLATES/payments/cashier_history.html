@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Cashier Meal Transactions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/cashier_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <a class="nav-link" href="{% url 'dashboard:cashier' %}">
+          <img src="{% static 'images/homeicon.png' %}" alt="Dashboard icon">
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link active" href="{% url 'payments:cashier_history' %}">
+          <img src="{% static 'images/formicon.png' %}" alt="Transaction history icon">
+          <span>Meal Transactions</span>
+        </a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+          <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <section class="cashier-filter-panel" aria-label="Transaction trend filters panel">
+        <h2>Filter Meal Transactions</h2>
+        <form method="get" class="cashier-filter-form" aria-label="Transaction trend filters">
+          <div>
+            <label for="startDate">Start Date</label>
+            <input id="startDate" type="date" name="start_date" value="{{ start_date }}">
+          </div>
+          <div>
+            <label for="endDate">End Date</label>
+            <input id="endDate" type="date" name="end_date" value="{{ end_date }}">
+          </div>
+          <div>
+            <label for="minAmount">Min Meal Amount</label>
+            <input id="minAmount" type="number" step="0.01" min="0" name="min_amount" value="{{ min_amount }}" placeholder="0">
+          </div>
+          <div>
+            <label for="maxAmount">Max Meal Amount</label>
+            <input id="maxAmount" type="number" step="0.01" min="0" name="max_amount" value="{{ max_amount }}" placeholder="1000000">
+          </div>
+          <div class="cashier-filter-actions">
+            <button type="submit" class="proceed-btn filter-btn">Apply Filters</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="history-panel" aria-label="Cashier meal transaction history">
+        <h1>Meal Transactions</h1>
+
+        <div class="history-header-row cashier-header-grid">
+          <span>Receipt ID</span>
+          <span>Customer ID</span>
+          <span>Customer Name</span>
+          <span>Date</span>
+          <span>Time</span>
+          <span>Meal Amount</span>
+        </div>
+        <hr class="history-divider">
+
+        <div class="history-list">
+          {% if transactions %}
+            {% for tx in transactions %}
+              <div class="history-row cashier-row-grid">
+                <span class="history-receipt">{{ tx.payment_id }}</span>
+                <span class="history-date">{{ tx.payer_profile.user_id|default:'-' }}</span>
+                <span class="history-date">{{ tx.payer_profile.full_name|default:'-' }}</span>
+                <span class="history-date">{{ tx.payment_date|date:'d M Y' }}</span>
+                <span class="history-date">{{ tx.payment_date|date:'H:i' }}</span>
+                <span class="history-pill meal-pill">Ksh {{ tx.meal_amount|default_if_none:0|floatformat:0 }}</span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="history-empty">No meal transactions yet.</p>
+          {% endif %}
+        </div>
+
+        <section class="cashier-trend-grid" aria-label="Transaction trend charts">
+          <article class="chart-wrap">
+            <h4>7-Day Meal Trend</h4>
+            <canvas id="cashierHistoryWeeklyChart"></canvas>
+          </article>
+          <article class="chart-wrap">
+            <h4>6-Month Meal Summary</h4>
+            <canvas id="cashierHistoryMonthlyChart"></canvas>
+          </article>
+        </section>
+
+        <section class="cashier-totals-grid" aria-label="Daily and monthly totals tables">
+          <article class="cashier-total-card">
+            <h4>Daily Totals</h4>
+            <table class="cashier-total-table">
+              <thead><tr><th>Date</th><th>Total Meal Amount (KES)</th></tr></thead>
+              <tbody>
+                {% for row in daily_totals %}
+                  <tr><td>{{ row.day|date:'d M Y' }}</td><td>{{ row.total|floatformat:2 }}</td></tr>
+                {% empty %}
+                  <tr><td colspan="2">No daily totals for current filter.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </article>
+          <article class="cashier-total-card">
+            <h4>Monthly Totals</h4>
+            <table class="cashier-total-table">
+              <thead><tr><th>Month</th><th>Total Meal Amount (KES)</th></tr></thead>
+              <tbody>
+                {% for row in monthly_totals %}
+                  <tr><td>{{ row.month|date:'M Y' }}</td><td>{{ row.total|floatformat:2 }}</td></tr>
+                {% empty %}
+                  <tr><td colspan="2">No monthly totals for current filter.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+
+  {{ weekly_labels|json_script:"cashier-history-weekly-labels" }}
+  {{ weekly_values|json_script:"cashier-history-weekly-values" }}
+  {{ trend_labels|json_script:"cashier-history-monthly-labels" }}
+  {{ trend_values|json_script:"cashier-history-monthly-values" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="{% static 'javascript/cashier_history.js' %}"></script>
+</body>
+</html>
