@@ -5,3 +5,12 @@ __pycache__/
 .env
 .DS_Store
 Thumbs.db
+
+# Load/performance test outputs
+app1/locust_results*.csv
+
+# Local backup databases
+app1/db.sqlite3.backup_*
+
+# User-uploaded media in local development
+app1/media/
