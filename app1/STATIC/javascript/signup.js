@@ -258,8 +258,13 @@
   }
 
   function validateFullName() {
-    var value = capitalizeWords(fullName.value).slice(0, 100);
-    fullName.value = value;
+    var raw = String(fullName.value || '').replace(/\s+/g, ' ');
+    if (raw.length > 100) {
+      raw = raw.slice(0, 100);
+      fullName.value = raw;
+    }
+
+    var value = raw.trim();
 
     if (!value) {
       showError(fullName, 'Full name is required.');
@@ -419,7 +424,7 @@
       return false;
     }
     if (!/^TSC\d{7}$/.test(value)) {
-      showError(tscNumber, 'Invalid TSC number format.');
+      showError(tscNumber, 'Format must be TSC0000000.');
       return false;
     }
 
@@ -453,8 +458,8 @@
       return true;
     }
 
-    var value = capitalizeWords(schoolName.value).slice(0, 100);
-    schoolName.value = value;
+    var raw = schoolName.value || '';
+    var value = capitalizeWords(raw).slice(0, 100);
 
     if (!value) {
       showError(schoolName, 'School name is required.');
@@ -467,6 +472,14 @@
 
     clearError(schoolName);
     return true;
+  }
+
+  function normalizeSchoolNameOnBlur() {
+    if (!schoolName) {
+      return;
+    }
+    schoolName.value = capitalizeWords(schoolName.value).slice(0, 100);
+    validateSchoolName();
   }
 
   function ensureSchoolRoleDropdown() {
@@ -656,6 +669,10 @@
     field.addEventListener('input', validateAll);
     field.addEventListener('change', validateAll);
   });
+
+  if (schoolName) {
+    schoolName.addEventListener('blur', normalizeSchoolNameOnBlur);
+  }
 
   [cashierNationalId, schoolNationalId, schoolCode, schoolYearsOfService, cashierYearsOfService]
     .filter(Boolean)

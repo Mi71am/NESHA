@@ -12,8 +12,8 @@
 </head>
 <body class="page-auth page-signup">
   <main class="page-wrap">
-    <img class="top-logo" src="{% static 'images/officialLogo.png' %}" alt="Nesha logo">
-    <a class="top-back-arrow" href="{% url 'onboarding' %}" aria-label="Back to onboarding">&#8592;</a>
+    {% comment %} <img class="top-logo" src="{% static 'images/officialLogo.png' %}" alt="Nesha logo"> {% endcomment %}
+    <a class="top-back-arrow" href="{% url 'accounts:onboarding' %}" aria-label="Back to onboarding">&#8592;</a>
 
     <section class="form-card signup-card" aria-label="Signup panel">
       <h1 class="form-title">BEGIN YOUR JOURNEY</h1>
@@ -22,7 +22,7 @@
         <p class="field-error">{{ form.non_field_errors|join:", " }}</p>
       {% endif %}
 
-      <form id="signupForm" class="user-form" method="post" novalidate>
+      <form id="signupForm" class="user-form" method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
 
         <label class="field-label" for="fullName">Full Name</label>
@@ -41,6 +41,12 @@
         <input class="field-input" id="phoneNumber" name="phone_number" type="text" placeholder="Enter your phone number" value="{{ form.phone_number.value|default_if_none:'' }}" required>
         {% if form.phone_number.errors %}
           <p class="field-error">{{ form.phone_number.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="profilePicture">Profile Picture (Optional)</label>
+        <input class="field-input field-file" id="profilePicture" name="profile_picture" type="file" accept="image/*">
+        {% if form.profile_picture.errors %}
+          <p class="field-error">{{ form.profile_picture.errors|join:", " }}</p>
         {% endif %}
 
         <label class="field-label" for="roleSelect">Intended Role</label>
@@ -149,7 +155,7 @@
         <button id="signupSubmit" class="main-btn" type="submit" disabled>Sign Up</button>
         <p class="auth-switch-text">
           Already have an account?
-          <a class="auth-switch-link" href="{% url 'login' %}">Login here</a>
+          <a class="auth-switch-link" href="{% url 'accounts:login' %}">Login here</a>
         </p>
       </form>
     </section>

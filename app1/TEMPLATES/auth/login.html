@@ -14,7 +14,7 @@
   <main class="page-wrap">
     <img class="top-logo" src="{% static 'images/officialLogo.png' %}" alt="Official logo">
 
-    <a class="go-back" href="{% url 'onboarding' %}" aria-label="Back to onboarding">&#8249;</a>
+    <a class="go-back" href="{% url 'accounts:onboarding' %}" aria-label="Back to onboarding">&#8249;</a>
 
     <section class="form-card login-card" aria-label="Login panel">
       <h1 class="form-title">BEGIN YOUR JOURNEY</h1>
@@ -58,7 +58,7 @@
 
         <p class="helper-text">
           Don't have an account?
-          <a class="helper-link" href="{% url 'signup' %}">Sign Up Here</a>
+          <a class="helper-link" href="{% url 'accounts:signup' %}">Sign Up Here</a>
         </p>
       </form>
 

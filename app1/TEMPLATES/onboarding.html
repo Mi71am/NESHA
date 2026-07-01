@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UmojaPay Onboarding</title>
+  <title>Nesha Onboarding</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@100;300;400;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
     <section id="heroSlides" class="hero-slides" aria-label="Onboarding images">
       <article class="hero-slide screen-one is-active" aria-label="Onboarding slide 1" data-banner="Every Path Deserves A Future">
         <img class="shared-bg" src="{% static 'images/onAllContainerA.png' %}" alt="Shared background" />
-        <img class="layer on1-a" src="{% static 'images/on1container1A.png' %}" alt="Nesha logo and children" />
+        <img class="layer on1-a" src="{% static 'images/on1Container1A.png' %}" alt="Nesha logo and children" />
         <img class="layer on1-b" src="{% static 'images/on1Container1B.png' %}" alt="Decorative tree" />
 
         <div class="slide-text on1-text">
@@ -56,8 +56,8 @@
       <div class="banner-inner">
         <p id="bannerTagline" class="banner-tagline">Every Path Deserves A Future</p>
         <div class="banner-actions">
-          <button class="banner-btn" type="button">Sign Up</button>
-          <button class="banner-btn" type="button">Login</button>
+          <a class="banner-btn" href="{% url 'accounts:signup' %}">Sign Up</a>
+          <a class="banner-btn" href="{% url 'accounts:login' %}">Login</a>
         </div>
       </div>
     </section>
