@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Beneficiary Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  {% if is_admin %}
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+  {% else %}
+    <link rel="stylesheet" href="{% static 'css/school_dashboard.css' %}">
+  {% endif %}
+  <link rel="stylesheet" href="{% static 'css/beneficiary_detail.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      {% if is_admin %}
+      <nav class="sidebar-nav" aria-label="Admin navigation">
+        <a class="nav-link" href="{% url 'dashboard:administrator' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link active" href="{% url 'beneficiaries:admin_list' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="Beneficiaries icon"><span>Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_users' %}"><img src="{% static 'images/adminusers.png' %}" alt="Users icon"><span>Users</span></a>
+        <a class="nav-link" href="#"><img src="{% static 'images/impactstatsicon.png' %}" alt="Reports icon"><span>Reports</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_monitoring' %}"><img src="{% static 'images/formicon.png' %}" alt="Monitoring icon"><span>Monitoring</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+      {% else %}
+      <p class="profile-tsc">TSC: {{ tsc_number }}</p>
+      <nav class="sidebar-nav" aria-label="School navigation">
+        <a class="nav-link" href="{% url 'dashboard:school_representative' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:register' %}"><img src="{% static 'images/schregistericon.png' %}" alt="Register beneficiaries icon"><span>Register Beneficiaries</span></a>
+        <a class="nav-link active" href="{% url 'beneficiaries:view' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="View beneficiaries icon"><span>View Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:reassess' %}"><img src="{% static 'images/schreassessicon.png' %}" alt="Re-assess beneficiaries icon"><span>Re-assess Beneficiaries</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+      {% endif %}
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content beneficiary-main">
+      <section class="id-cards-row">
+        <article class="id-card id-card-one"><h3>Beneficiary ID</h3><p>#{{ beneficiary.beneficiary_id }}</p></article>
+        <article class="id-card id-card-two"><h3>Learner Name</h3><p>{{ beneficiary.learner_name|default:"-" }}</p></article>
+        <article class="id-card id-card-three"><h3>School Name</h3><p>{{ beneficiary.representative.school_name|default:"-" }}</p></article>
+      </section>
+
+      <section class="white-panel detail-table-wrap">
+        <table class="detail-table">
+          <tbody>
+            <tr><th>Eligibility Score</th><td>{{ beneficiary.eligibility_score|default:"-" }}</td></tr>
+            <tr><th>Support Cycle Count</th><td>{{ beneficiary.effective_cycle_count|floatformat:1 }}</td></tr>
+            <tr><th>Total Allocations Amount Received</th><td>KES {{ total_allocations|floatformat:2 }}</td></tr>
+            <tr><th>Last Allocation Date</th><td>{% if beneficiary.last_allocation_date %}{{ beneficiary.last_allocation_date|date:"d M Y" }}{% else %}Not allocated yet{% endif %}</td></tr>
+            <tr><th>Current Status</th><td>{{ status_label }}</td></tr>
+            {% if status_reason %}
+              <tr><th>Status Reason</th><td>{{ status_reason }}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </section>
+
+      <section class="white-panel">
+        <h2>Allocation Timeline (Current Round)</h2>
+        <canvas id="allocationChart" height="120"></canvas>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const labels = {{ allocation_chart_labels_json|safe }};
+    const amounts = {{ allocation_chart_amounts_json|safe }};
+    const ctx = document.getElementById('allocationChart');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Allocation Amount (KES)',
+            data: amounts,
+            borderColor: '#5b7f70',
+            backgroundColor: 'rgba(91, 127, 112, 0.15)',
+            fill: true,
+            tension: 0.25,
+            pointRadius: 3,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: true } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

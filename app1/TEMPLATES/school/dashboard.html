@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA School Representative Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/school_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="School sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+        <p class="profile-tsc">TSC: {{ tsc_number }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="School navigation">
+        <a class="nav-link active" href="{% url 'dashboard:school_representative' %}">
+          <img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon">
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="{% url 'beneficiaries:register' %}">
+          <img src="{% static 'images/schregistericon.png' %}" alt="Register beneficiaries icon">
+          <span>Register Beneficiaries</span>
+        </a>
+        <a class="nav-link" href="{% url 'beneficiaries:view' %}">
+          <img src="{% static 'images/schviewbenicon.png' %}" alt="View beneficiaries icon">
+          <span>View Beneficiaries</span>
+        </a>
+        <a class="nav-link" href="{% url 'beneficiaries:reassess' %}">
+          <img src="{% static 'images/schreassessicon.png' %}" alt="Re-assess beneficiaries icon">
+          <span>Re-assess Beneficiaries</span>
+        </a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+          <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <img class="bg bg-one" src="{% static 'images/cu1Container1.png' %}" alt="">
+      <img class="bg bg-two" src="{% static 'images/sch1Container1.png' %}" alt="">
+      <img class="bg bg-three" src="{% static 'images/cu1Container3.png' %}" alt="">
+      <img class="bg bg-four" src="{% static 'images/cu1Container4.png' %}" alt="">
+
+      <section class="welcome-panel" aria-label="Welcome panel">
+        <img class="welcome-bg" src="{% static 'images/schreppanel.png' %}" alt="Welcome panel background">
+        <div class="welcome-text">
+          <h1>WELCOME SCHOOL REPRESENTATIVE</h1>
+          <p class="rep-name">{{ display_name }}</p>
+          <p class="rep-school">{{ school_name }}</p>
+        </div>
+      </section>
+
+      <div class="divider-line external-divider"></div>
+
+      <section class="content-panel no-panel-skin" aria-label="School dashboard panel">
+
+        <div class="metric-cards">
+          <article class="metric-card active-card">
+            <h3>Active Beneficiaries</h3>
+            <p>{{ active_beneficiaries }}</p>
+          </article>
+          <article class="metric-card pending-card">
+            <a class="metric-link metric-link-card" href="{% url 'beneficiaries:pending' %}">
+              <h3>Pending Questionnaires</h3>
+              <p>{{ pending_questionnaires }}</p>
+            </a>
+          </article>
+          <article class="metric-card flagged-card">
+            <h3>Flagged Beneficiaries</h3>
+            <p>{{ flagged_beneficiaries }}</p>
+          </article>
+        </div>
+
+        <h2 class="overview-title">BENEFICIARY SUPPORT OVERVIEW</h2>
+
+        <section class="table-wrap" aria-label="Approved beneficiaries">
+          <table class="overview-table">
+            <thead>
+              <tr>
+                <th>Learner Name</th>
+                <th>Date Enrolled</th>
+                <th>Last Allocation Date</th>
+                <th>Support Cycles</th>
+                <th>Reassessment Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for learner in support_overview %}
+                <tr>
+                  <td><a href="{% url 'beneficiaries:detail' learner.beneficiary_id %}">{{ learner.learner_name }}</a></td>
+                  <td>{{ learner.registration_date|date:"d M Y" }}</td>
+                  <td>{% if learner.last_allocation_date %}{{ learner.last_allocation_date|date:"d M Y" }}{% else %}Not allocated yet{% endif %}</td>
+                  <td>{{ learner.effective_cycle_count|floatformat:1 }}</td>
+                  <td>{{ learner.get_reassessment_status_display }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5">No active beneficiaries yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+
+        <section class="table-wrap" aria-label="Not eligible beneficiaries">
+          <table class="overview-table rejected-table">
+            <thead>
+              <tr>
+                <th>Learner Name</th>
+                <th>Date Rejected</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for learner in rejected_beneficiaries %}
+                <tr>
+                  <td><a href="{% url 'beneficiaries:detail' learner.beneficiary_id %}">{{ learner.learner_name }}</a></td>
+                  <td>{{ learner.registration_date|date:"d M Y" }}</td>
+                  <td><span class="reason-pill">{{ learner.rejection_reason|default:"Did not meet current eligibility threshold." }}</span></td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3">No rejected beneficiaries currently.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <section class="urgent-support-footer" aria-label="Urgent support message">
+        <form method="post" action="{% url 'dashboard:send_urgent_message' %}" class="urgent-support-form">
+          {% csrf_token %}
+          <label for="schoolUrgentMessage">Need assistance with the system? Send urgent messages here</label>
+          <div class="urgent-input-row">
+            <textarea id="schoolUrgentMessage" name="message_text" rows="2" maxlength="1000" placeholder="Describe your issue briefly..." required></textarea>
+            <button type="submit">Send</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

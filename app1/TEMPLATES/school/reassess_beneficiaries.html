@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Re-assess Beneficiaries</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/school_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="School sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+        <p class="profile-tsc">TSC: {{ tsc_number }}</p>
+      </div>
+      <nav class="sidebar-nav" aria-label="School navigation">
+        <a class="nav-link" href="{% url 'dashboard:school_representative' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:register' %}"><img src="{% static 'images/schregistericon.png' %}" alt="Register beneficiaries icon"><span>Register Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:view' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="View beneficiaries icon"><span>View Beneficiaries</span></a>
+        <a class="nav-link active" href="{% url 'beneficiaries:reassess' %}"><img src="{% static 'images/schreassessicon.png' %}" alt="Re-assess beneficiaries icon"><span>Re-assess Beneficiaries</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <h1 class="assessment-title">RE-ASSESS BENEFICIARIES</h1>
+
+      {% if messages %}
+        <div class="form-messages">
+          {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="assessment-panel">
+        <table class="overview-table">
+          <thead><tr><th>Learner Name</th><th>Next Reassessment Window</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for learner in flagged %}
+              <tr>
+                <td>{{ learner.learner_name }}</td>
+                <td>{% if learner.reassessment_due_date %}{{ learner.reassessment_due_date|date:"d M Y" }}{% else %}Available now{% endif %}</td>
+                <td>
+                  <div class="inline-actions">
+                    <form method="post">
+                      {% csrf_token %}
+                      <input type="hidden" name="beneficiary_id" value="{{ learner.beneficiary_id }}">
+                      <button type="submit" name="action" value="start_reassessment" class="btn-reassess">Reassess</button>
+                    </form>
+
+                    <button type="button" class="btn-remove" onclick="toggleRemoveForm('{{ learner.beneficiary_id }}')">Remove</button>
+                  </div>
+
+                  <form method="post" class="remove-form" id="remove-form-{{ learner.beneficiary_id }}" hidden>
+                    {% csrf_token %}
+                    <input type="hidden" name="beneficiary_id" value="{{ learner.beneficiary_id }}">
+                    <input type="text" name="removal_reason" maxlength="255" placeholder="Removal reason (20 words max)">
+                    <button type="submit" name="action" value="remove" class="btn-remove">Confirm Remove</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">No beneficiaries currently due for reassessment.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function toggleRemoveForm(id) {
+      const form = document.getElementById(`remove-form-${id}`);
+      if (!form) return;
+      form.hidden = !form.hidden;
+    }
+  </script>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Pending Questionnaires</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/school_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="School sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+        <p class="profile-tsc">TSC: {{ tsc_number }}</p>
+      </div>
+      <nav class="sidebar-nav" aria-label="School navigation">
+        <a class="nav-link" href="{% url 'dashboard:school_representative' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:register' %}"><img src="{% static 'images/schregistericon.png' %}" alt="Register beneficiaries icon"><span>Register Beneficiaries</span></a>
+        <a class="nav-link active" href="{% url 'beneficiaries:pending' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="Pending questionnaires icon"><span>Pending Questionnaires</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:view' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="View beneficiaries icon"><span>View Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:reassess' %}"><img src="{% static 'images/schreassessicon.png' %}" alt="Re-assess beneficiaries icon"><span>Re-assess Beneficiaries</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <h1 class="assessment-title">PENDING QUESTIONNAIRES</h1>
+
+      {% if messages %}
+        <div class="form-messages">
+          {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="assessment-panel">
+        <table class="overview-table">
+          <thead>
+            <tr>
+              <th>Learner Name</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for learner in pending %}
+              <tr>
+                <td>{{ learner.learner_name|default:"Draft Learner" }}</td>
+                <td>
+                  <a class="resume-btn" href="{% url 'beneficiaries:resume' learner.beneficiary_id %}">Complete Questionnaire</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="2">No pending questionnaires found.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

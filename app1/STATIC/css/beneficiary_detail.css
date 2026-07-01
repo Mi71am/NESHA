@@ -1,0 +1,130 @@
+.beneficiary-main {
+  display: grid;
+  gap: 14px;
+}
+
+.id-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.id-card {
+  border-radius: 14px;
+  padding: 14px;
+  color: #f7f2ec;
+  box-shadow: 0 8px 20px rgba(63, 48, 41, 0.08);
+}
+
+.id-card h3 {
+  margin: 0;
+  font-family: "Marcellus", serif;
+  font-size: 0.95rem;
+}
+
+.id-card p {
+  margin: 8px 0 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.id-card-one { background: #7b6a58; }
+.id-card-two { background: #8a735e; }
+.id-card-three { background: #6a735f; }
+
+.beneficiary-main .white-panel h2 {
+  color: #3f3029;
+}
+
+.detail-table-wrap {
+  overflow-x: auto;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Montserrat", sans-serif;
+  color: #3f3029;
+}
+
+.detail-table th,
+.detail-table td {
+  padding: 11px;
+  border-bottom: 1px solid #ece6e2;
+  text-align: left;
+}
+
+.detail-table thead th {
+  background: #ecefed;
+  font-size: 0.85rem;
+}
+
+.detail-table tbody th {
+  width: 38%;
+  background: #f6f7f6;
+  font-weight: 600;
+}
+
+.detail-table a {
+  color: #1f1f1f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.detail-table a:hover,
+.detail-table a:focus-visible {
+  color: #1f1f1f;
+  text-decoration: underline;
+}
+
+.search-panel label {
+  display: block;
+  margin-bottom: 6px;
+  color: #3f3029;
+  font-family: "Montserrat", sans-serif;
+}
+
+.search-row {
+  display: grid;
+  gap: 10px;
+}
+
+.search-input-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.search-input-wrap input,
+.filter-grid input,
+.filter-grid select {
+  border: 1px solid #d5dbd7;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.search-btn {
+  border: none;
+  border-radius: 10px;
+  background: #4f6f62;
+  color: #fff;
+  padding: 10px 14px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 980px) {
+  .id-cards-row,
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}

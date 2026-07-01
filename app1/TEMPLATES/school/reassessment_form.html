@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Beneficiary Reassessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/school_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="School sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+        <p class="profile-tsc">TSC: {{ tsc_number }}</p>
+      </div>
+      <nav class="sidebar-nav" aria-label="School navigation">
+        <a class="nav-link" href="{% url 'dashboard:school_representative' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:register' %}"><img src="{% static 'images/schregistericon.png' %}" alt="Register beneficiaries icon"><span>Register Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:view' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="View beneficiaries icon"><span>View Beneficiaries</span></a>
+        <a class="nav-link active" href="{% url 'beneficiaries:reassess' %}"><img src="{% static 'images/schreassessicon.png' %}" alt="Re-assess beneficiaries icon"><span>Re-assess Beneficiaries</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <h1 class="assessment-title">NESHA BENEFICIARY REASSESSMENT FORM</h1>
+
+      {% if messages %}
+        <div class="form-messages">
+          {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="assessment-panel">
+        <p><strong>Learner:</strong> {{ beneficiary.learner_name }}</p>
+        <form method="post" class="assessment-form">
+          {% csrf_token %}
+
+          {% for q in questions %}
+            <div class="question-item">
+              <p><strong>{{ q.number }}.</strong> {{ q.text }}</p>
+              <div class="options-grid">
+                {% for option in q.options %}
+                  <label class="option-pill">
+                    <input type="radio" name="{{ q.key }}" value="{{ option.value }}" required>
+                    <span>{{ option.label }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+
+          <h2 class="section-title">Open Evidence</h2>
+          <div class="question-item">
+            <label>Evidence Statement 1 (100-200 words)</label>
+            <textarea name="evidence_statement_1" rows="4" required></textarea>
+          </div>
+          <div class="question-item">
+            <label>Evidence Statement 2 (100-200 words)</label>
+            <textarea name="evidence_statement_2" rows="4" required></textarea>
+          </div>
+
+          <label class="check-wrap">
+            <input type="checkbox" name="verification_confirmed">
+            <span>I confirm that this reassessment reflects the learner's current circumstances and may be verified by NESHA administrators.</span>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit">Submit Reassessment</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>
