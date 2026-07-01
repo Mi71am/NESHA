@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nesha Edit Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body class="page-auth page-signup">
+  <main class="page-wrap">
+    <a class="top-back-arrow" href="{% url dashboard_route %}" aria-label="Back to dashboard">&#8592;</a>
+
+    <section class="form-card signup-card" aria-label="Edit profile panel">
+      <h1 class="form-title">UPDATE YOUR PROFILE</h1>
+
+      {% if messages %}
+        <div class="flash-wrap" aria-live="polite">
+          {% for message in messages %}
+            <p class="flash-msg {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        <p class="field-error">{{ form.non_field_errors|join:", " }}</p>
+      {% endif %}
+
+      <form id="profileUpdateForm" class="user-form" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <label class="field-label" for="fullName">Full Name</label>
+        <input class="field-input" id="fullName" name="full_name" type="text" placeholder="Enter your full name" value="{{ form.full_name.value|default_if_none:'' }}" required>
+        {% if form.full_name.errors %}
+          <p class="field-error">{{ form.full_name.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="email">Email Address</label>
+        <input class="field-input" id="email" name="email" type="email" placeholder="Enter your email" value="{{ form.email.value|default_if_none:'' }}" required>
+        {% if form.email.errors %}
+          <p class="field-error">{{ form.email.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="phoneNumber">Phone Number</label>
+        <input class="field-input" id="phoneNumber" name="phone_number" type="text" inputmode="numeric" placeholder="Enter your phone number" value="{{ form.phone_number.value|default_if_none:'' }}" required>
+        {% if form.phone_number.errors %}
+          <p class="field-error">{{ form.phone_number.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="roleReadonly">Role</label>
+        <input class="field-input" id="roleReadonly" type="text" value="{{ display_role }}" readonly>
+
+        {% if school_rep %}
+          <label class="field-label" for="nationalIdReadonly">National ID Number</label>
+          <input class="field-input" id="nationalIdReadonly" type="text" value="{{ school_rep.national_id_number }}" readonly>
+
+          <label class="field-label" for="tscReadonly">TSC Number</label>
+          <input class="field-input" id="tscReadonly" type="text" value="{{ school_rep.tsc_number }}" readonly>
+        {% endif %}
+
+        <label class="field-label" for="profilePicture">Change Profile Picture</label>
+        <input class="field-input field-file" id="profilePicture" name="profile_picture" type="file" accept="image/*">
+        {% if form.profile_picture.errors %}
+          <p class="field-error">{{ form.profile_picture.errors|join:", " }}</p>
+        {% endif %}
+
+        <label class="field-label" for="newPassword">New Password</label>
+        <div class="input-wrap">
+          <input class="field-input" id="newPassword" name="new_password" type="password" placeholder="Leave blank to keep current password">
+          <button class="toggle-password" type="button" data-target="newPassword">Show</button>
+        </div>
+        {% if form.new_password.errors %}
+          <p class="field-error">{{ form.new_password.errors|join:", " }}</p>
+        {% endif %}
+
+        <ul id="passwordRules" class="pw-rules" aria-live="polite">
+          <li data-rule="length" class="bad">At least 8 characters</li>
+          <li data-rule="upper" class="bad">At least one uppercase letter</li>
+          <li data-rule="lower" class="bad">At least one lowercase letter</li>
+          <li data-rule="number" class="bad">At least one number</li>
+          <li data-rule="special" class="bad">At least one special character</li>
+        </ul>
+
+        <label class="field-label" for="confirmPassword">Confirm New Password</label>
+        <div class="input-wrap">
+          <input class="field-input" id="confirmPassword" name="confirm_new_password" type="password" placeholder="Confirm new password">
+          <button class="toggle-password" type="button" data-target="confirmPassword">Show</button>
+        </div>
+        <p id="passwordMatchError" class="field-error" hidden>Passwords do not match</p>
+        {% if form.confirm_new_password.errors %}
+          <p class="field-error">{{ form.confirm_new_password.errors|join:", " }}</p>
+        {% endif %}
+
+        <button id="profileSaveBtn" class="main-btn" type="submit">Save Changes</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="{% static 'javascript/profile_edit.js' %}"></script>
+</body>
+</html>

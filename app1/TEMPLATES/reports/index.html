@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Impact Statistics</title>
+  {% now "U" as cache_bust %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/reports_page.css' %}?v={{ cache_bust }}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="profile-block">
+        {% if profile.profile_picture %}
+          <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+        {% else %}
+          <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+        {% endif %}
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <a class="nav-link" href="{% url 'dashboard:customer' %}">
+          <img src="{% static 'images/homeicon.png' %}" alt="Dashboard icon">
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="{% url 'donations:index' %}">
+          <img src="{% static 'images/hearticon.png' %}" alt="Donate icon">
+          <span>Donate</span>
+        </a>
+        <a class="nav-link active" href="{% url 'reports:index' %}">
+          <img src="{% static 'images/impactstatsicon.png' %}" alt="Impact statistics icon">
+          <span>Impact Statistics</span>
+        </a>
+        <a class="nav-link" href="{% url 'payments:history' %}">
+          <img src="{% static 'images/formicon.png' %}" alt="Transaction history icon">
+          <span>Transaction History</span>
+        </a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+          <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+          <span>Logout</span>
+        </a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <img class="bg bg-one" src="{% static 'images/cu1Container1.png' %}" alt="">
+      <img class="bg bg-two" src="{% static 'images/cu1Container2.png' %}" alt="">
+      <img class="bg bg-three" src="{% static 'images/cu1Container3.png' %}" alt="">
+      <img class="bg bg-four" src="{% static 'images/cu1Container4.png' %}" alt="">
+
+      <section class="impact-panel" aria-label="Impact statistics panel">
+        <div class="top-cards">
+          <article class="impact-card donations-card">
+            <h3>Total Donations Made</h3>
+            <p>Ksh {{ total_donations|floatformat:0 }}</p>
+          </article>
+          <article class="impact-card meals-card">
+            <h3>Meals Supported</h3>
+            <p>{{ meals_supported }}</p>
+          </article>
+          <article class="impact-card recent-card">
+            <h3>Recent Donation</h3>
+            <p>Ksh {{ recent_donation|floatformat:0 }}</p>
+          </article>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card contribution-card">
+            <h4>Contribution Summary (Past Week)</h4>
+            <div class="chart-canvas-wrap weekly-chart-wrap">
+              <canvas id="weeklyContributionChart"></canvas>
+            </div>
+          </article>
+
+          <article class="stat-card insights-card">
+            <h4>Giving Insights</h4>
+            <div class="insight-row">
+              <span>Average Monthly Donation</span>
+              <strong>Ksh {{ average_monthly_donation|floatformat:0 }}</strong>
+            </div>
+            <div class="insight-row">
+              <span>Highest Single Donation</span>
+              <strong>Ksh {{ highest_single_donation|floatformat:0 }}</strong>
+            </div>
+            <div class="insight-row">
+              <span>This Month Total</span>
+              <strong>Ksh {{ this_month_total|floatformat:0 }}</strong>
+            </div>
+            <div class="insight-note">These insights are generated from your confirmed payments.</div>
+          </article>
+
+          <article class="stat-card trend-card">
+            <h4>6-Month Contribution Trend</h4>
+            <div class="chart-canvas-wrap trend-chart-wrap">
+              <canvas id="contributionTrendChart"></canvas>
+            </div>
+          </article>
+        </div>
+
+        <section class="journey-wrap" aria-label="Community journey progress">
+          <h4>Community Annual Meal Support Journey</h4>
+          <div class="journey-track" id="journeyTrack">
+            <div class="journey-fill" id="journeyFill"></div>
+            <img id="journeyBoat" class="journey-boat" src="{% static 'images/ROW.png' %}" alt="Boat illustration">
+            <div class="journey-tick" style="left: 20%;"><span>20%</span></div>
+            <div class="journey-tick" style="left: 50%;"><span>50%</span></div>
+            <div class="journey-tick" style="left: 70%;"><span>70%</span></div>
+          </div>
+          <p id="journeyPercentBadge" class="journey-percent-badge">{{ community_progress_percent }}%</p>
+          <p class="journey-meta">Goal: Ksh {{ annual_target|floatformat:0 }} · Raised So Far: Ksh {{ community_total|floatformat:0 }}</p>
+
+          <section class="meal-flow" aria-label="How contributions become meals">
+            <h2 class="meal-flow-title">One Contribution. Many Hands.</h2>
+            <p class="meal-flow-intro">Every contribution begins with generosity and ends with opportunity. Here's how each meal finds its way to the learner who needs it most.</p>
+
+            <div class="flow-steps" role="list">
+              <article class="flow-step" role="listitem">
+                <span class="flow-tag">🤝 SHARE</span>
+                <p>A meal purchased today can become hope for tomorrow. Through NESHA, campus communities can extend every purchase beyond themselves by contributing to a shared meal support fund.</p>
+              </article>
+              <article class="flow-step" role="listitem">
+                <span class="flow-tag">🏫 VERIFY</span>
+                <p>Partner schools identify learners facing genuine food insecurity. Every recommendation goes through a structured eligibility assessment so support reaches those who need it most.</p>
+              </article>
+              <article class="flow-step" role="listitem">
+                <span class="flow-tag">🍽️ NOURISH</span>
+                <p>Approved contributions are transformed into meal support using the current meal value of Ksh {{ average_meal_cost|floatformat:0 }}. Support is then allocated digitally through participating schools, ready for Tap2Eat redemption.</p>
+              </article>
+              <article class="flow-step" role="listitem">
+                <span class="flow-tag">🌱 RISE</span>
+                <p>Every complete meal reaches a learner. Any remaining balance is preserved and carried into the next distribution cycle so every contribution keeps moving toward its purpose.</p>
+              </article>
+            </div>
+
+            <section class="meal-flow-math" aria-label="Community journey summary">
+              <h6>Community Journey</h6>
+              <div class="journey-summary-grid">
+                <article class="journey-summary-item">
+                  <span>Community Contributions</span>
+                  <strong>Ksh {{ community_total|floatformat:0 }}</strong>
+                </article>
+                <article class="journey-summary-item">
+                  <span>Meals Ready To Share</span>
+                  <strong>{{ community_meals_equivalent }}</strong>
+                </article>
+              </div>
+              <p class="journey-summary-note">Every contribution remains within the community fund until it becomes part of a complete meal.</p>
+            </section>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+
+  {{ weekly_labels|json_script:"weekly-labels-data" }}
+  {{ weekly_values|json_script:"weekly-values-data" }}
+  {{ trend_labels|json_script:"trend-labels-data" }}
+  {{ donation_trend|json_script:"donation-trend-data" }}
+  {{ meal_trend|json_script:"meal-trend-data" }}
+
+  <script>
+    window.impactConfig = {
+      progressPercent: Number("{{ community_progress_percent }}") || 0
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="{% static 'javascript/reports_page.js' %}?v={{ cache_bust }}"></script>
+</body>
+</html>

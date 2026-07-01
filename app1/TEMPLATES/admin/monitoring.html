@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Admin Monitoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Admin sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Admin navigation">
+        <a class="nav-link" href="{% url 'dashboard:administrator' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:admin_list' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="Beneficiaries icon"><span>Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_users' %}"><img src="{% static 'images/adminusers.png' %}" alt="Users icon"><span>Users</span></a>
+        <a class="nav-link" href="#"><img src="{% static 'images/impactstatsicon.png' %}" alt="Reports icon"><span>Reports</span></a>
+        <a class="nav-link active" href="{% url 'dashboard:admin_monitoring' %}"><img src="{% static 'images/formicon.png' %}" alt="Monitoring icon"><span>Monitoring</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      {% if messages %}
+        <div class="form-messages">
+          {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="admin-top-grid" aria-label="Monitoring controls">
+        <article class="white-panel" aria-label="Allocation and annual goal controls">
+          <h2>Allocation Logic</h2>
+          <form method="post" class="stack-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_allocation_logic">
+            <label for="fullCycleInput">Full cycle amount (KES)</label>
+            <input id="fullCycleInput" type="number" step="0.01" min="1" name="full_cycle_per_learner" value="{{ allocation_config.full_cycle_per_learner }}" required>
+            <label for="halfCycleInput">Half cycle amount (KES)</label>
+            <input id="halfCycleInput" type="number" step="0.01" min="1" name="half_cycle_per_learner" value="{{ allocation_config.half_cycle_per_learner }}" required>
+            <button class="main-btn" type="submit">Save Allocation Logic</button>
+          </form>
+
+          <hr class="admin-divider">
+          <h3>Annual Goal ({{ current_year }})</h3>
+          <form method="post" class="stack-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_annual_goal">
+            <label for="annualGoalInput">Annual donation target (KES)</label>
+            <input id="annualGoalInput" type="number" step="0.01" min="1" name="annual_target" value="{{ annual_target }}" required>
+            <button class="main-btn" type="submit">Save Annual Goal</button>
+          </form>
+        </article>
+
+        <article class="white-panel" aria-label="Annual progress panel">
+          <h2>Community Annual Meal Support Journey</h2>
+          <div class="journey-track admin-journey-track" aria-hidden="true">
+            <div class="journey-fill admin-journey-fill" style="width: {{ community_progress_percent }}%;"></div>
+          </div>
+          <p class="journey-percent-badge admin-progress-badge">{{ community_progress_percent }}%</p>
+          <p class="journey-meta">Goal: Ksh {{ annual_target|floatformat:0 }} · Raised So Far: Ksh {{ community_total|floatformat:0 }}</p>
+        </article>
+      </section>
+
+      <section class="white-panel cycles-table-wrap" aria-label="Top contributors">
+        <h2>Top Contributors ({{ current_year }})</h2>
+        <table class="cycles-table contributor-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Contributor</th>
+              <th>Total Donations (KES)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in top_contributors %}
+              <tr class="{% if forloop.counter == 1 %}rank-gold{% elif forloop.counter == 2 %}rank-silver{% elif forloop.counter == 3 %}rank-bronze{% endif %}">
+                <td>#{{ forloop.counter }}</td>
+                <td>{{ c.payer_profile__full_name|default:"Unknown" }}</td>
+                <td>{{ c.total|floatformat:2 }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">No contributors found for this year yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NESHA Customer Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/customer_dashboard.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar" aria-label="Sidebar">
+            <div class="profile-block">
+                <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+                    {% if profile.profile_picture %}
+                        <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+                    {% else %}
+                        <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+                    {% endif %}
+                    <span class="profile-edit-text">Edit Profile...</span>
+                </a>
+                <h2 class="profile-name">{{ display_name }}</h2>
+                <p class="profile-email">{{ display_email }}</p>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Primary navigation">
+                <a class="nav-link active" href="{% url 'dashboard:customer' %}">
+                    <img src="{% static 'images/homeicon.png' %}" alt="Dashboard icon">
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-link" href="{% url 'donations:index' %}">
+                    <img src="{% static 'images/hearticon.png' %}" alt="Donate icon">
+                    <span>Donate</span>
+                </a>
+                <a class="nav-link" href="{% url 'reports:index' %}">
+                    <img src="{% static 'images/impactstatsicon.png' %}" alt="Impact statistics icon">
+                    <span>Impact Statistics</span>
+                </a>
+                <a class="nav-link" href="{% url 'payments:history' %}">
+                    <img src="{% static 'images/formicon.png' %}" alt="Transaction history icon">
+                    <span>Transaction History</span>
+                </a>
+
+                <a class="nav-link logout" href="{% url 'accounts:logout' %}">
+                    <img src="{% static 'images/logouticon.png' %}" alt="Logout icon">
+                    <span>Logout</span>
+                </a>
+            </nav>
+
+            <p class="nesha-brand">NESHA</p>
+        </aside>
+
+        <main class="main-content">
+            <img class="bg bg-one" src="{% static 'images/cu1Container1.png' %}" alt="">
+            <img class="bg bg-two" src="{% static 'images/cu1Container2.png' %}" alt="">
+            <img class="bg bg-three" src="{% static 'images/cu1Container3.png' %}" alt="">
+            <img class="bg bg-four" src="{% static 'images/cu1Container4.png' %}" alt="">
+
+            <section class="welcome-banner" aria-label="Welcome banner">
+                <h1>WELCOME, CUSTOMER:</h1>
+                <p>{{ display_name }}</p>
+            </section>
+
+            <section class="panel-row" aria-label="Customer dashboard panels">
+                <article class="panel panel-large payment-panel" aria-label="Make a payment">
+                    <h3 class="payment-title">Make A Payment</h3>
+                    <hr class="payment-divider">
+
+                    <div class="payment-field-wrap">
+                        <label class="sr-only" for="mealAmountInput">Enter Meal Amount</label>
+                        <input
+                            id="mealAmountInput"
+                            class="payment-input"
+                            type="number"
+                            min="0"
+                            max="1000000"
+                            step="1"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="Enter Meal Amount"
+                        >
+                    </div>
+
+                    <label class="donation-check-wrap" for="addDonationCheck">
+                        <input id="addDonationCheck" type="checkbox">
+                        <span>Add A Donation</span>
+                    </label>
+
+                    <p class="donation-note">ⓘ Your Ksh 20 Contribution can provide one meal to a learner</p>
+
+                    <div id="donationControls" class="donation-controls" hidden>
+                        <div class="donation-chip-row" role="group" aria-label="Donation options">
+                            <button class="donation-chip" type="button" data-donation="10">+ Ksh 10</button>
+                            <button class="donation-chip" type="button" data-donation="30">+ Ksh 30</button>
+                            <button class="donation-chip" type="button" data-donation="50">+ Ksh 50</button>
+                        </div>
+                    </div>
+
+                    <div class="payment-summary">
+                        <div class="summary-row donation-row">
+                            <span class="summary-label">Donation:</span>
+                            <span id="donationAmountBox" class="summary-value donation-box">-</span>
+                        </div>
+                        <div class="summary-row meal-row">
+                            <span class="summary-label">Meal Amount:</span>
+                            <span id="mealAmountBox" class="summary-value meal-box">-</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span class="summary-label">Total Amount:</span>
+                            <span id="totalAmountBox" class="summary-value total-box">-</span>
+                        </div>
+                    </div>
+
+                    <button id="proceedDashboardBtn" class="proceed-btn" type="button">Proceed To Payment</button>
+                </article>
+                <article class="panel panel-small transactions-panel" aria-label="Recent transactions">
+                    <h3 class="payment-title">Transactions</h3>
+                    <div class="transactions-header-row">
+                        <span>Date</span>
+                        <span>Donation Amount</span>
+                        <span>Meal Amount</span>
+                    </div>
+                    <hr class="payment-divider transactions-divider">
+
+                    <div class="transactions-list">
+                        {% if recent_transactions %}
+                            {% for tx in recent_transactions %}
+                                <div class="tx-row">
+                                    <span class="tx-date">{{ tx.payment_date|date:"d M Y" }}</span>
+                                    <span class="tx-pill donation-pill">Ksh {{ tx.donation_amount|default_if_none:0|floatformat:0 }}</span>
+                                    <span class="tx-pill meal-pill">Ksh {{ tx.meal_amount|default_if_none:0|floatformat:0 }}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="tx-empty">No transactions yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <a class="proceed-btn tx-view-all-btn" href="{% url 'payments:history' %}">View All Transactions</a>
+                </article>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="dashboard-footer-global" aria-label="Page footer">
+        <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+    </footer>
+
+    <script>
+        window.dashboardPaymentConfig = {
+            paymentsUrl: "{% url 'payments:index' %}"
+        };
+    </script>
+    <script src="{% static 'javascript/customer_dashboard.js' %}"></script>
+</body>
+</html>

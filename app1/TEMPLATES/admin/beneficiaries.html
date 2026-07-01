@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Admin Beneficiaries</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/beneficiary_detail.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Admin sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Admin navigation">
+        <a class="nav-link" href="{% url 'dashboard:administrator' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link active" href="{% url 'beneficiaries:admin_list' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="Beneficiaries icon"><span>Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_users' %}"><img src="{% static 'images/adminusers.png' %}" alt="Users icon"><span>Users</span></a>
+        <a class="nav-link" href="#"><img src="{% static 'images/impactstatsicon.png' %}" alt="Reports icon"><span>Reports</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_monitoring' %}"><img src="{% static 'images/formicon.png' %}" alt="Monitoring icon"><span>Monitoring</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content beneficiary-main">
+      <section class="white-panel search-panel">
+        <form method="get" class="search-row">
+          <label for="searchBeneficiary"><strong>Search Beneficiary</strong></label>
+          <div class="search-input-wrap">
+            <input id="searchBeneficiary" type="text" name="q" value="{{ q }}" placeholder="Search by Beneficiary ID or Learner Name">
+            <button type="submit" class="search-btn" aria-label="Search">
+              <span>Search</span>
+            </button>
+          </div>
+
+          <div class="filter-grid">
+            <div>
+              <label for="schoolFilter">School</label>
+              <input list="schoolOptions" id="schoolFilter" name="school" value="{{ school }}" placeholder="Select or type school">
+              <datalist id="schoolOptions">
+                {% for s in school_options %}
+                  <option value="{{ s }}"></option>
+                {% endfor %}
+              </datalist>
+            </div>
+            <div>
+              <label for="statusFilter">Status</label>
+              <select id="statusFilter" name="status">
+                <option value="" {% if not status %}selected{% endif %}>All</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                <option value="flagged" {% if status == 'flagged' %}selected{% endif %}>Flagged</option>
+                <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
+                <option value="deleted" {% if status == 'deleted' %}selected{% endif %}>Deleted</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="white-panel detail-table-wrap">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>Beneficiary ID</th>
+              <th>Learner Name</th>
+              <th>School</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in results %}
+              <tr>
+                <td>#{{ row.beneficiary_id }}</td>
+                <td><a href="{% url 'beneficiaries:detail' row.beneficiary_id %}">{{ row.learner_name|default:'-' }}</a></td>
+                <td>{{ row.school_name }}</td>
+                <td>{{ row.status_label }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">No beneficiaries found for current filters.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>

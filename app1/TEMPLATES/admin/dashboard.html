@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NESHA Administrator Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar" aria-label="Admin sidebar">
+      <div class="profile-block">
+        <a class="profile-edit-link" href="{% url 'accounts:profile' %}">
+          {% if profile.profile_picture %}
+            <img class="profile-photo" src="{{ profile.profile_picture.url }}" alt="Profile picture">
+          {% else %}
+            <img class="profile-photo" src="{% static 'images/default.jpg' %}" onerror="this.onerror=null;this.src='{% static 'images/officialLogo2.png' %}';" alt="Default profile">
+          {% endif %}
+          <span class="profile-edit-text">Edit Profile...</span>
+        </a>
+        <h2 class="profile-name">{{ display_name }}</h2>
+        <p class="profile-email">{{ display_email }}</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Admin navigation">
+        <a class="nav-link active" href="{% url 'dashboard:administrator' %}"><img src="{% static 'images/schhomeicon.png' %}" alt="Dashboard icon"><span>Dashboard</span></a>
+        <a class="nav-link" href="{% url 'beneficiaries:admin_list' %}"><img src="{% static 'images/schviewbenicon.png' %}" alt="Beneficiaries icon"><span>Beneficiaries</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_users' %}"><img src="{% static 'images/adminusers.png' %}" alt="Users icon"><span>Users</span></a>
+        <a class="nav-link" href="#"><img src="{% static 'images/impactstatsicon.png' %}" alt="Reports icon"><span>Reports</span></a>
+        <a class="nav-link" href="{% url 'dashboard:admin_monitoring' %}"><img src="{% static 'images/formicon.png' %}" alt="Monitoring icon"><span>Monitoring</span></a>
+        <a class="nav-link logout" href="{% url 'accounts:logout' %}"><img src="{% static 'images/logouticon.png' %}" alt="Logout icon"><span>Logout</span></a>
+      </nav>
+
+      <p class="nesha-brand">NESHA</p>
+    </aside>
+
+    <main class="main-content">
+      <section class="admin-id-panel" aria-label="Administrator identity panel">
+        <p>ADMIN ID: {{ admin_id }}</p>
+      </section>
+
+      {% if messages %}
+        <div class="form-messages">
+          {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <section class="admin-top-grid" aria-label="Representative and cycle management">
+        <article class="white-panel" aria-label="Cycle action panel">
+          <h2>Cycle Simulation</h2>
+          <p>Use this action to manually trigger the distribution simulation cycle from the admin dashboard.</p>
+          <form method="post">
+            {% csrf_token %}
+            <button class="main-btn" type="submit" name="action" value="initiate_cycle">Initiate Cycle</button>
+          </form>
+
+          <section class="cycle-progress-panel" aria-label="Cycle funding readiness">
+            <h3>Cycle Funding Progress</h3>
+            <p class="cycle-progress-copy">
+              Learners (X): <strong>{{ active_beneficiaries }}</strong> · Average meal amount: <strong>KES {{ average_meal_amount|floatformat:0 }}</strong>
+            </p>
+
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ funding_progress_pct }}" aria-label="Cycle funding progress">
+              <div class="progress-fill stage-{{ funding_stage }}" style="width: {{ funding_progress_pct }}%;"></div>
+            </div>
+
+            <div class="progress-milestones" aria-label="Funding thresholds">
+              <div class="milestone {% if pool_balance >= one_week_target and one_week_target > 0 %}is-active{% endif %}">
+                <span class="dot"></span>
+                <p>X * 20 = KES {{ one_week_target|floatformat:0 }}</p>
+                <small>Half-cycle ready (0.5 cycle)</small>
+              </div>
+              <div class="milestone {% if pool_balance >= two_week_target and two_week_target > 0 %}is-active{% endif %}">
+                <span class="dot"></span>
+                <p>X * 20 * 2 = KES {{ two_week_target|floatformat:0 }}</p>
+                <small>Full 2-week cycle ready (1.0 cycle)</small>
+              </div>
+            </div>
+
+            <p class="cycle-status-note">
+              {% if funding_stage == "full" %}
+                Ready for full-cycle distribution. {% if over_target_amount > 0 %}Surplus above full target: KES {{ over_target_amount|floatformat:2 }}.{% endif %}
+              {% elif funding_stage == "half" %}
+                Balance supports half-cycle allocation now. When initiated, this records as 0.5 cycle and combines in later runs.
+              {% elif active_beneficiaries == 0 %}
+                No active learners yet. Add active beneficiaries to start cycle funding calculations.
+              {% else %}
+                Not enough balance yet. System waits until at least X * 20 is available before allocation.
+              {% endif %}
+            </p>
+            <p class="cycle-progress-copy small">After each initiated cycle, pool balance is reduced by allocations and this progress resets automatically based on remaining funds.</p>
+          </section>
+
+          <a class="view-all-link" href="{% url 'dashboard:admin_monitoring' %}">Manage Allocation Logic & Annual Goal in Monitoring...</a>
+        </article>
+
+        <article class="white-panel" aria-label="School representatives summary">
+          <h2>School Representatives</h2>
+          <table class="mini-table">
+            <thead>
+              <tr><th>Name</th><th>School</th></tr>
+            </thead>
+            <tbody>
+              {% for rep in recent_school_reps %}
+                <tr>
+                  <td>{{ rep.user.app_profile.full_name|default:rep.user.username }}</td>
+                  <td>{{ rep.school_name|default:"-" }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="2">No school representatives yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <a class="view-all-link" href="{% url 'dashboard:admin_users' %}">View All Users...</a>
+        </article>
+      </section>
+
+      <section class="admin-messages-grid" aria-label="Admin urgent inbox panel">
+        <article class="white-panel admin-message-panel">
+          <h2>Urgent Help Messages</h2>
+          <div class="admin-message-list">
+            {% for msg in urgent_messages %}
+              <div class="admin-message-item {% if msg.is_completed %}is-completed{% endif %}">
+                <p class="meta">
+                  <strong>{{ msg.sender_user.app_profile.full_name|default:msg.sender_user.username }}</strong>
+                  <span>({{ msg.get_sender_role_display }})</span>
+                  <span> · {{ msg.created_at|date:"d M Y, H:i" }}</span>
+                </p>
+                <p class="text">{{ msg.message_text }}</p>
+
+                {% if msg.is_completed %}
+                  <p class="completion-note">
+                    Completed by ADM-{{ msg.completed_by.id|stringformat:"05d" }} on {{ msg.completed_at|date:"d M Y, H:i" }}
+                  </p>
+                {% else %}
+                  <form method="post" action="{% url 'dashboard:complete_urgent_message' %}" class="complete-message-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="message_id" value="{{ msg.message_id }}">
+                    <label>
+                      <input type="checkbox" required>
+                      Mark addressed
+                    </label>
+                    <button type="submit" class="mini-btn">Complete</button>
+                  </form>
+                {% endif %}
+              </div>
+            {% empty %}
+              <p>No urgent help messages at the moment.</p>
+            {% endfor %}
+          </div>
+        </article>
+      </section>
+
+      <section class="white-panel urgent-panel" aria-label="Urgent system messages">
+        <h2>Urgent System Messages</h2>
+        <div class="urgent-grid">
+          <article>
+            <h3>Rejected Applications Needing Review</h3>
+            <ul>
+              {% for learner in urgent_rejected %}
+                <li>
+                  <a href="{% url 'dashboard:admin_users' %}?beneficiary_status=rejected">{{ learner.learner_name|default:"Unnamed learner" }}</a>
+                  <span> · {{ learner.representative.school_name|default:"Unknown school" }}</span>
+                </li>
+              {% empty %}
+                <li>No urgent rejected applications.</li>
+              {% endfor %}
+            </ul>
+          </article>
+          <article>
+            <h3>Reassessments Overdue</h3>
+            <ul>
+              {% for learner in urgent_reassessments %}
+                <li>
+                  {{ learner.learner_name|default:"Unnamed learner" }}
+                  <span> · due {{ learner.reassessment_due_date|date:"d M Y" }}</span>
+                </li>
+              {% empty %}
+                <li>No overdue reassessments.</li>
+              {% endfor %}
+            </ul>
+          </article>
+          <article>
+            <h3>Inconsistency Flags</h3>
+            <ul>
+              {% for item in urgent_inconsistent %}
+                <li>
+                  {{ item.beneficiary.learner_name|default:"Unnamed learner" }}
+                  <span> · {{ item.assessment_date|date:"d M Y" }}</span>
+                </li>
+              {% empty %}
+                <li>No flagged inconsistencies right now.</li>
+              {% endfor %}
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Administrator statistics">
+        <article class="white-panel stat-card">
+          <h3>Donation Pool Balance</h3>
+          <p>KES {{ pool_balance|floatformat:2 }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Total Donations (This Year)</h3>
+          <p>KES {{ year_total_donations|floatformat:2 }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Active Beneficiaries</h3>
+          <p>{{ active_beneficiaries }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Active Cashiers</h3>
+          <p>{{ active_cashiers }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Pending Questionnaires</h3>
+          <p>{{ pending_questionnaires }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Registered Schools</h3>
+          <p>{{ schools_registered }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Reassessments Due</h3>
+          <p>{{ reassessments_due }}</p>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Rejected Applicants</h3>
+          <p>{{ rejected_applicants }}</p>
+          <a class="view-all-link" href="{% url 'dashboard:admin_users' %}?beneficiary_status=rejected">Review Reasons</a>
+        </article>
+        <article class="white-panel stat-card">
+          <h3>Last Distribution</h3>
+          <p>{% if last_distribution_date %}{{ last_distribution_date|date:"d M Y" }}{% else %}Not run yet{% endif %}</p>
+        </article>
+      </section>
+
+      <section class="white-panel cycles-table-wrap" aria-label="Cycle transactions history">
+        <h2>Cycle Transactions</h2>
+        <table class="cycles-table">
+          <thead>
+            <tr>
+              <th>Batch ID</th>
+              <th>Date</th>
+              <th>Beneficiaries</th>
+              <th>Total Allocated (KES)</th>
+              <th>Cycle Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cycle in recent_cycles %}
+              <tr>
+                <td>#{{ cycle.batch_id }}</td>
+                <td>{{ cycle.distribution_date|date:"d M Y, H:i" }}</td>
+                <td>{{ cycle.beneficiary_count|default:0 }}</td>
+                <td>{{ cycle.total_amount|default:0|floatformat:2 }}</td>
+                <td>
+                  {% if cycle.beneficiary_count and cycle.total_amount %}
+                    {% widthratio cycle.total_amount cycle.beneficiary_count 1 as per_learner %}
+                    {% if per_learner == '100' %}0.5 cycle{% else %}1.0 cycle{% endif %}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5">No cycle transactions yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    window.setTimeout(() => {
+      document.querySelectorAll('.form-messages .message').forEach((el) => {
+        el.classList.add('msg-hide');
+      });
+    }, 4000);
+  </script>
+
+  <footer class="dashboard-footer-global" aria-label="Page footer">
+    <img src="{% static 'images/footerpanel.png' %}" alt="Footer panel">
+  </footer>
+</body>
+</html>
